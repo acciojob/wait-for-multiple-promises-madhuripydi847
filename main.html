@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wait for Multiple Promises</title>
+    <title>Promise Timing Table</title>
     <style>
         table {
             width: 50%;
@@ -13,20 +13,19 @@
         th, td {
             border: 1px solid black;
             padding: 10px;
-            text-align: left;
+            text-align: center;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #f4f4f4;
         }
     </style>
 </head>
 <body>
-    <h2>Promise Execution Time</h2>
     <table>
         <thead>
             <tr>
                 <th>Promise</th>
-                <th>Time Taken (Seconds)</th>
+                <th>Time (seconds)</th>
             </tr>
         </thead>
         <tbody id="output">
@@ -38,25 +37,29 @@
 
     <script>
         function createPromise(index) {
-            const time = Math.random() * 2 + 1; // Random time between 1 and 3 seconds
-            return new Promise(resolve => {
-                setTimeout(() => resolve({ index, time: time.toFixed(3) }), time * 1000);
-            });
+            const time = (Math.random() * 2 + 1).toFixed(3); // Random time between 1 and 3 seconds
+            return new Promise(resolve => 
+                setTimeout(() => resolve({ index, time }), time * 1000)
+            );
         }
 
         const promises = [createPromise(1), createPromise(2), createPromise(3)];
 
         Promise.all(promises).then(results => {
-            const tbody = document.getElementById("output");
-            tbody.innerHTML = ""; // Clear loading message
-            
+            const output = document.getElementById("output");
+            output.innerHTML = ""; // Clear loading row
+
             results.forEach(result => {
-                const row = `<tr><td>Promise ${result.index}</td><td>${result.time}</td></tr>`;
-                tbody.innerHTML += row;
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>Promise ${result.index}</td><td>${result.time}</td>`;
+                output.appendChild(row);
             });
-            
-            const maxTime = Math.max(...results.map(r => parseFloat(r.time))).toFixed(3);
-            tbody.innerHTML += `<tr><td>Total</td><td>${maxTime}</td></tr>`;
+
+            // Calculate total time (maximum of individual times)
+            const totalTime = Math.max(...results.map(r => parseFloat(r.time))).toFixed(3);
+            const totalRow = document.createElement("tr");
+            totalRow.innerHTML = `<td>Total</td><td>${totalTime}</td>`;
+            output.appendChild(totalRow);
         });
     </script>
 </body>
